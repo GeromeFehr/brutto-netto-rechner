@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Brutto-Netto Rechner (Lernstation)</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
+    h1 { text-align: center; }
+    label { display:block; margin-top: 8px; }
+    input { width: 120px; }
+    .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  </style>
+</head>
+<body>
+  <h1>Brutto-Netto Rechner</h1>
+
+  <div>
+    <label>Bruttogehalt (€): <input id="brutto" type="number" value="3000"></label>
+    <label>Lohnsteuer (€): <input id="lst" type="number" value="400"></label>
+    <label>Kirchensteuer-Satz (%): <input id="kist" type="number" value="8"></label>
+    <label>VL-AG (€): <input id="vlag" type="number" value="20"></label>
+    <label>VS (€): <input id="vs" type="number" value="40"></label>
+    <label>Vorschuss (€): <input id="vorschuss" type="number" value="0"></label>
+
+    <h3>Sozialabgaben (AN-Anteil in %)</h3>
+    <div class="grid">
+      <label>KV (%): <input id="kv" type="number" step="0.1" value="7.8"></label>
+      <label>RV (%): <input id="rv" type="number" step="0.1" value="9.3"></label>
+      <label>AV (%): <input id="av" type="number" step="0.1" value="1.3"></label>
+      <label>PV (%): <input id="pv" type="number" step="0.1" value="2.4"></label>
+    </div>
+
+    <button onclick="calcReal()">Berechnen (Realität)</button>
+  </div>
+
+  <div class="result" id="output"></div>
+
+  <script>
+    function euro(v) {
+      return v.toFixed(2).replace('.', ',') + ' €';
+    }
+
+    function calcReal() {
+      const brutto = parseFloat(document.getElementById('brutto').value || 0);
+      const lst    = parseFloat(document.getElementById('lst').value || 0);
+      const kist_s = parseFloat(document.getElementById('kist').value || 0);
+      const vlag   = parseFloat(document.getElementById('vlag').value || 0);
+      const vs     = parseFloat(document.getElementById('vs').value || 0);
+      const vorsch = parseFloat(document.getElementById('vorschuss').value || 0);
+
+      const kvp = parseFloat(document.getElementById('kv').value || 0);
+      const rvp = parseFloat(document.getElementById('rv').value || 0);
+      const avp = parseFloat(document.getElementById('av').value || 0);
+      const pvp = parseFloat(document.getElementById('pv').value || 0);
+
+      const svStart = brutto + vlag;
+      const kist = lst * (kist_s / 100);
+
+      const kv = svStart * (kvp / 100);
+      const rv = svStart * (rvp / 100);
+      const av = svStart * (avp / 100);
+      const pv = svStart * (pvp / 100);
+
+      const steuerSv = lst + kist + kv + rv + av + pv;
+      const gesamt = steuerSv + vs + vorsch;
+
+      const netto = svStart - gesamt;
+      const quoteSteuerSv = (steuerSv / svStart) * 100;
+      const quoteGesamt = (gesamt / svStart) * 100;
+
+      document.getElementById('output').innerHTML = `
+        <strong>Ausgang:</strong><br>
+        Brutto + VL-AG: ${euro(svStart)}<br><br>
+        <strong>Abzüge:</strong><br>
+        Lohnsteuer: ${euro(lst)}<br>
+        Kirchensteuer: ${euro(kist)}<br>
+        KV: ${euro(kv)}<br>
+        RV: ${euro(rv)}<br>
+        AV: ${euro(av)}<br>
+        PV: ${euro(pv)}<br>
+        VS: ${euro(vs)}<br>
+        Vorschuss: ${euro(vorsch)}<br><br>
+        <strong>Nettogehalt:</strong> ${euro(netto)}<br><br>
+        Steuern + SV: ${euro(steuerSv)} (${quoteSteuerSv.toFixed(2)} %)<br>
+        Gesamtabzüge: ${euro(gesamt)} (${quoteGesamt.toFixed(2)} %)
+      `;
+    }
+  </script>
+</body>
+</html>
