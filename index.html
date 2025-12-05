@@ -1,65 +1,476 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Brutto-Netto Rechner</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #111827, #020617);
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(135deg, #020617aa, #020617ee);
+      border-radius: 24px;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(148,163,184,0.2);
+      padding: 28px 32px 32px;
+      backdrop-filter: blur(18px);
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.04em;
+    }
+
+    .title-block p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: linear-gradient(135deg, #22c55e, #22d3ee);
+      color: #020617;
+      font-weight: 600;
+      box-shadow: 0 0 0 1px rgba(15,23,42,0.6);
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card {
+      border-radius: 18px;
+      padding: 16px 18px 18px;
+      background: radial-gradient(circle at top left, #111827, #020617);
+      border: 1px solid rgba(148,163,184,0.25);
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 16px;
+      margin-top: 8px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    label {
+      color: #e5e7eb;
+    }
+
+    input, select {
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 6px 8px;
+      background: rgba(15,23,42,0.8);
+      color: #f9fafb;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    input:focus, select:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px #22c55e55;
+      background: rgba(15,23,42,0.95);
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .chip-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.8);
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chip.active {
+      border-color: #22c55e;
+      background: rgba(34,197,94,0.12);
+      color: #bbf7d0;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #22c55e, #22d3ee);
+      color: #020617;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow:
+        0 12px 30px rgba(34,197,94,0.35),
+        0 0 0 1px rgba(15,23,42,0.7);
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    button span.icon {
+      font-size: 17px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .netto-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #a5b4fc;
+    }
+
+    .subline {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.9);
+      white-space: nowrap;
+    }
+
+    .pill strong { color: #e5e7eb; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 10px 18px;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    .results-block h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+    }
+
+    .results-block pre {
+      margin: 0;
+      background: rgba(15,23,42,0.9);
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(51,65,85,0.8);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .footnote {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <div class="app-header">
+      <div class="title-block">
+        <h1>Brutto-Netto Rechner</h1>
+        <p>Mit Bundesland, Kirchensteuer, BBG und visueller Abgabenübersicht – gebaut als Lernstation.</p>
+      </div>
+      <div class="badge">Beta · Schulstoff + Reality-Check</div>
+    </div>
 
-  <h1>Brutto-Netto Rechner</h1>
+    <div class="layout">
+      <!-- Eingabe -->
+      <div class="card">
+        <div class="section-label">Eingaben</div>
+        <h2>Grunddaten & Region</h2>
 
-  <!-- Deine Eingaben -->
-  <label>Bruttogehalt (€): <input id="brutto" type="number"></label>
-  <label>Lohnsteuer (€): <input id="lst" type="number"></label>
-  <label>Kirchensteuer-Satz (%): <input id="kist" type="number"></label>
-  <label>VL-AG (€): <input id="vlag" type="number"></label>
-  <label>VS (€): <input id="vs" type="number"></label>
-  <label>Vorschuss (€): <input id="vorschuss" type="number"></label>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Bruttogehalt (€)</label>
+            <input id="brutto" type="number" value="3000" />
+          </div>
+          <div class="form-row">
+            <label>Lohnsteuer (€)</label>
+            <input id="lst" type="number" value="400" />
+          </div>
+          <div class="form-row">
+            <label>VL-AG (€)</label>
+            <input id="vlag" type="number" value="20" />
+          </div>
+          <div class="form-row">
+            <label>Vermögenswirksame Leistung VS (€)</label>
+            <input id="vs" type="number" value="40" />
+          </div>
+          <div class="form-row">
+            <label>Vorschuss-Verrechnung (€)</label>
+            <input id="vorschuss" type="number" value="0" />
+          </div>
+          <div class="form-row">
+            <label>Bundesland</label>
+            <select id="bundesland" onchange="updateKircheFromState()">
+              <option value="none">– auswählen –</option>
+              <option value="BW">Baden-Württemberg</option>
+              <option value="BY">Bayern</option>
+              <option value="BE">Berlin</option>
+              <option value="BB">Brandenburg</option>
+              <option value="HB">Bremen</option>
+              <option value="HH">Hamburg</option>
+              <option value="HE">Hessen</option>
+              <option value="MV">Mecklenburg-Vorpommern</option>
+              <option value="NI">Niedersachsen</option>
+              <option value="NW">Nordrhein-Westfalen</option>
+              <option value="RP">Rheinland-Pfalz</option>
+              <option value="SL">Saarland</option>
+              <option value="SN">Sachsen</option>
+              <option value="ST">Sachsen-Anhalt</option>
+              <option value="SH">Schleswig-Holstein</option>
+              <option value="TH">Thüringen</option>
+            </select>
+          </div>
+        </div>
 
-  <h3>SV-Anteil AN (%)</h3>
-  <label>KV (%): <input id="kv" type="number"></label>
-  <label>RV (%): <input id="rv" type="number"></label>
-  <label>AV (%): <input id="av" type="number"></label>
-  <label>PV (%): <input id="pv" type="number"></label>
+        <div class="toggle-row">
+          <span>Kirchenmitglied:</span>
+          <div class="chip-group">
+            <div class="chip active" data-kirche="yes" onclick="setKirche(true)">Ja</div>
+            <div class="chip" data-kirche="no" onclick="setKirche(false)">Nein</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;color:#9ca3af;">
+            Kirchensteuer-Satz: <span id="kistLabel">9&nbsp;%</span>
+          </div>
+        </div>
 
-  <button onclick="calcReal()">Berechnen</button>
+        <div class="section-label" style="margin-top:16px;">AN-Anteile Sozialversicherung</div>
+        <h2 style="margin-bottom:6px;">Sätze in % (anpassbar)</h2>
 
-  <div id="output"></div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>KV (% – z. B. 7,8)</label>
+            <input id="kv" type="number" step="0.1" value="7.8" />
+          </div>
+          <div class="form-row">
+            <label>RV (% – z. B. 9,3)</label>
+            <input id="rv" type="number" step="0.1" value="9.3" />
+          </div>
+          <div class="form-row">
+            <label>AV (% – z. B. 1,3)</label>
+            <input id="av" type="number" step="0.1" value="1.3" />
+          </div>
+          <div class="form-row">
+            <label>PV (% – z. B. 2,4)</label>
+            <input id="pv" type="number" step="0.1" value="2.4" />
+          </div>
+        </div>
 
-  <!-- ********* HIER KOMMT DAS SCRIPT REIN ********* -->
+        <button onclick="calcReal()">
+          <span class="icon">⚡</span>
+          Berechnen (Realität mit BBG)
+        </button>
+
+        <p class="footnote">
+          Hinweis: Lohnsteuer wird hier als Vorgabe eingegeben (wie im Unterricht).<br>
+          KV/PV-BBG: 5.512,50 € · RV/AV-BBG: 8.050,00 € (an euer Arbeitsblatt anpassbar).
+        </p>
+      </div>
+
+      <!-- Ausgabe -->
+      <div class="card">
+        <div class="section-label">Ergebnisse</div>
+        <div class="result-header">
+          <div>
+            <h2>Nettogehalt & Abgaben</h2>
+            <div class="subline">Vergleich vor / nach Abzügen, inkl. BBG & Kirchensteuer.</div>
+          </div>
+          <div class="netto-value" id="nettoHeadline">–</div>
+        </div>
+
+        <div class="pill-row">
+          <div class="pill">
+            <strong>Brutto + VL-AG:</strong> <span id="pillStart">–</span>
+          </div>
+          <div class="pill">
+            <strong>Steuern + SV:</strong> <span id="pillSteuerSv">–</span>
+          </div>
+          <div class="pill">
+            <strong>Gesamtabzüge:</strong> <span id="pillGesamt">–</span>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <div class="results-block">
+            <h3>Abzüge im Detail</h3>
+            <pre id="outputDetail">Bitte Daten eingeben und auf „Berechnen“ klicken.</pre>
+          </div>
+          <div class="results-block">
+            <h3>Quoten & Basiswerte</h3>
+            <pre id="outputMeta">Steuersatz, BBG-Basis und Abgabenquoten erscheinen hier.</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-
+    // Hilfsfunktion: Euro formatieren
     function euro(v) {
       return v.toFixed(2).replace('.', ',') + ' €';
     }
 
+    // Bundesland -> Kirchensteuersatz (8/9 %)
+    function updateKircheFromState() {
+      const state = document.getElementById('bundesland').value;
+      const kircheYes = document.querySelector('.chip[data-kirche="yes"]').classList.contains('active');
+
+      let rate = 0;
+      if (kircheYes) {
+        if (state === 'BW' || state === 'BY') {
+          rate = 8;
+        } else if (state !== 'none') {
+          rate = 9;
+        } else {
+          rate = 9; // Default, falls nix gewählt
+        }
+      } else {
+        rate = 0;
+      }
+      document.getElementById('kistLabel').textContent = rate + ' %';
+    }
+
+    function setKirche(isMember) {
+      const yesChip = document.querySelector('.chip[data-kirche="yes"]');
+      const noChip  = document.querySelector('.chip[data-kirche="no"]');
+      if (isMember) {
+        yesChip.classList.add('active');
+        noChip.classList.remove('active');
+      } else {
+        yesChip.classList.remove('active');
+        noChip.classList.add('active');
+      }
+      updateKircheFromState();
+    }
+
+    // Hauptberechnung
     function calcReal() {
-      const brutto = parseFloat(document.getElementById('brutto').value || 0);
-      const lst    = parseFloat(document.getElementById('lst').value || 0);
-      const kist_s = parseFloat(document.getElementById('kist').value || 0);
-      const vlag   = parseFloat(document.getElementById('vlag').value || 0);
-      const vs     = parseFloat(document.getElementById('vs').value || 0);
-      const vorsch = parseFloat(document.getElementById('vorschuss').value || 0);
+      const brutto   = parseFloat(document.getElementById('brutto').value || 0);
+      const lst      = parseFloat(document.getElementById('lst').value || 0);
+      const vlag     = parseFloat(document.getElementById('vlag').value || 0);
+      const vs       = parseFloat(document.getElementById('vs').value || 0);
+      const vorsch   = parseFloat(document.getElementById('vorschuss').value || 0);
 
-      const kvp = parseFloat(document.getElementById('kv').value || 0);
-      const rvp = parseFloat(document.getElementById('rv').value || 0);
-      const avp = parseFloat(document.getElementById('av').value || 0);
-      const pvp = parseFloat(document.getElementById('pv').value || 0);
+      const kvp      = parseFloat(document.getElementById('kv').value || 0);
+      const rvp      = parseFloat(document.getElementById('rv').value || 0);
+      const avp      = parseFloat(document.getElementById('av').value || 0);
+      const pvp      = parseFloat(document.getElementById('pv').value || 0);
 
+      // Kirchensteuer-Satz aus UI
+      const kistText = document.getElementById('kistLabel').textContent;
+      const kistRate = parseFloat(kistText.replace('%','')) || 0;
+
+      // Start: Brutto + VL-AG
       const svStart = brutto + vlag;
 
-      // <<< BBG HIER >>>
+      // BBG-Werte (an euer Blatt anpassbar)
       const KV_PV_BBG = 5512.5;
       const RV_AV_BBG = 8050.0;
 
-      const kist = lst * (kist_s / 100);
+      // Kirchensteuer
+      const kist = lst * (kistRate / 100);
 
+      // Bemessungsgrundlagen mit BBG
       const kvBase = Math.min(svStart, KV_PV_BBG);
       const pvBase = kvBase;
       const rvBase = Math.min(svStart, RV_AV_BBG);
       const avBase = rvBase;
 
+      // Sozialabgaben
       const kv = kvBase * (kvp / 100);
       const rv = rvBase * (rvp / 100);
       const av = avBase * (avp / 100);
@@ -67,14 +478,56 @@
 
       const steuerSv = lst + kist + kv + rv + av + pv;
       const gesamt   = steuerSv + vs + vorsch;
-      const netto = svStart - gesamt;
+      const netto    = svStart - gesamt;
 
-      document.getElementById('output').innerHTML = `
-        Nettogehalt: ${euro(netto)}<br>
-        Gesamtabzüge: ${euro(gesamt)}
-      `;
+      const quoteSteuerSv = svStart > 0 ? (steuerSv / svStart) * 100 : 0;
+      const quoteGesamt   = svStart > 0 ? (gesamt   / svStart) * 100 : 0;
+
+      // Ausgabe oben
+      document.getElementById('nettoHeadline').textContent = euro(netto);
+      document.getElementById('pillStart').textContent     = euro(svStart);
+      document.getElementById('pillSteuerSv').textContent  = euro(steuerSv) + ` (${quoteSteuerSv.toFixed(2)} %)`;
+      document.getElementById('pillGesamt').textContent    = euro(gesamt) + ` (${quoteGesamt.toFixed(2)} %)`;
+
+      // Detailblock
+      document.getElementById('outputDetail').textContent =
+        `Ausgang:
+Brutto + VL-AG: ${euro(svStart)}
+
+Abzüge:
+Lohnsteuer:      ${euro(lst)}
+Kirchensteuer:   ${euro(kist)}
+KV (Basis ${euro(kvBase)}): ${euro(kv)}
+RV (Basis ${euro(rvBase)}): ${euro(rv)}
+AV (Basis ${euro(avBase)}): ${euro(av)}
+PV (Basis ${euro(pvBase)}): ${euro(pv)}
+VS:              ${euro(vs)}
+Vorschuss:       ${euro(vorsch)}
+
+Nettogehalt:     ${euro(netto)}`;
+
+      // Meta-/Quote-Block
+      document.getElementById('outputMeta').textContent =
+        `Einstellungen:
+Kirchensteuer-Satz: ${kistRate.toFixed(1)} %
+KV-Satz AN:         ${kvp.toFixed(2)} %
+RV-Satz AN:         ${rvp.toFixed(2)} %
+AV-Satz AN:         ${avp.toFixed(2)} %
+PV-Satz AN:         ${pvp.toFixed(2)} %
+
+Beitragsbemessungsgrenzen:
+KV/PV-BBG:  ${euro(KV_PV_BBG)}
+RV/AV-BBG:  ${euro(RV_AV_BBG)}
+
+Quoten (bezogen auf Brutto + VL-AG):
+Steuern + SV:      ${euro(steuerSv)}  (${quoteSteuerSv.toFixed(2)} %)
+Gesamtabzüge:      ${euro(gesamt)}  (${quoteGesamt.toFixed(2)} %)
+Netto-Quote:       ${netto > 0 && svStart > 0 ? (netto / svStart * 100).toFixed(2) : '0.00'} %`;
     }
-  </script>
 
+    // default einmal berechnen
+    updateKircheFromState(); // setzt 9 % falls kein Land gewählt
+    calcReal();
+  </script>
 </body>
 </html>
